@@ -16,8 +16,13 @@ print("starting up!!!!")
 
 search_string = "Baghdad+embassy"
 
-news = feedparser.parse("https://news.google.com/rss/search?q="+search_string)
+check_load = requests.get("https://news.google.com/rss/search?q="+search_string)
+print("check_load",check_load)
 
+#news = feedparser.parse("https://news.google.com/rss/search?q="+search_string)
+news = feedparser.parse(check_load.text)
+
+print("news=",news)
 
 blacklist = [
 	'[document]',
