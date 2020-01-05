@@ -3,6 +3,14 @@
 import feedparser
 import requests
 from bs4 import BeautifulSoup
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+class Article:
+    def __init__(self,url,title,text):
+        self.url = url
+        self.title = title
+        self.data = text
+
 
 print("starting up!!!!")
 
@@ -23,7 +31,9 @@ blacklist = [
 	# there may be more elements you don't want, such as "style", etc.
 ]
 
-for entry in news.entries:
+articles = []
+
+for entry in news.entries[0:10]:
     print(entry.link)
     print(entry.title)
 
@@ -32,8 +42,18 @@ for entry in news.entries:
     all_text = soup.find_all('p')
     good_text = []
     for t in all_text:
+        # probably don't need this check anymore...
         if t.parent.name not in blacklist:
-            good_text.append(t.string)
+            if t.string != None:
+                good_text.append(t.string)
 
     print(good_text)
 
+    articles.append(Article(entry.link,entry.title,good_text))
+
+vectorizer = TfidfVectorizer(max_df=0.5, max_features=25,
+                            min_df=2, stop_words='english',
+                            use_idf=True)
+
+X = vectorizer.fit_transform([" ".join(x.data) for x in articles])
+print("X=",X)
